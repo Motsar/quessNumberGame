@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuessThe number</title>
+    <style>
+        #setnumbers{
+            display: inline;
+        }
+        #restart{
+            display: none;
+        }
+        #quessnumbers{
+            display: none;
+        }
+        #firstError,
+        #secondError{
+            background-color:red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quess the number!</h1>
+    <!--New game fields with lower number and higher number inputs-->
+    <div id="setnumbers">
+        <h3>Set the lower and higher number so the machine can pick a random number from between</h3>
+        <label for="lownum" >Set the lower number!</label><br>
+        <input type="number" name="lownum" id="lownum" minlength="1"><br>
+        <label for="higherNum" >Set the higher number!</label><br>
+        <input type="number" name="higherNum" id="higherNum" minlength="1"><br>
+        <button onClick="startGame()">Start Game</button><br>
+        <span id="firstError"></span>
+    </div>
+    <!--In game input field with enter number button-->
+    <div id="quessnumbers">
+        <h3>Try to quess the number!</h3>
+        <h4 id="between">The random number is between :</h4>
+        <span id="tries">Your tries: </span><br>
+        <label for="inputNum" >Number:</label><br>
+        <input type="number" name="inputNum" id="inputNum"><br>
+        <button id="setInput">Enter</button><br>
+    </div>
+    <span id="secondError"></span><br>
+    <!--Restart game button-->
+    <button id="restart" onclick="restart()">Restart</button><br>
+
+</body>
+<script>
+
+    //Game function
+    function startGame(){
+        //Get values for lower and hgher number
+        const min= parseInt(document.getElementById("lownum").value);
+        const max= parseInt(document.getElementById("higherNum").value);
+        //Error handling for inserting values
+        if(min==0 || max==0 || !min || !max) return document.querySelector("#firstError").innerHTML ="You need to enter a lower number and higher number";
+        if(min<0 || max<0) return document.querySelector("#firstError").innerHTML ="You need to enter positive numbers";
+        if(max<=min)return document.querySelector("#firstError").innerHTML ="Lower number needs to be lower than higher number";
+        let tries = 0;
+        //Game logic
+        const randNum = randomNumber(min, max);
+        document.querySelector("#between").innerHTML+= min + " - " + max;
+        console.log(randNum);
+        //Hiding gameStart input field and showing ingame field 
+        document.querySelector("#setnumbers").style.display="none";
+        document.querySelector("#quessnumbers").style.display="inline";
+        //Event listener for game logic
+        document.querySelector("#setInput").addEventListener('click', function(){
+            //If the imput value is equal to generated random number
+            let input = document.querySelector("#inputNum").value;
+            if(input==randNum){
+                document.querySelector("#secondError").style.backgroundColor="green";
+                document.querySelector("#quessnumbers").style.display="none";
+                changeButtons()
+                return document.querySelector("#secondError").innerHTML="Congrats! You have won the game! The random number is :" + input;
+                //If the input is lower than generated random number
+            }else if(input<randNum){
+                document.querySelector("#secondError").innerHTML="The number is higher!";
+                document.querySelector("#tries").innerHTML+=input + " ";
+                tries+=1;
+                if(tries==10){
+                    changeButtons()
+                    return document.querySelector("#secondError").innerHTML="You have lost the game! you had more than 10 tries";
+                }
+                //If the input is higher than generated random number
+            }else if(input>randNum){
+                document.querySelector("#secondError").innerHTML="The number is lower!";
+                document.querySelector("#tries").innerHTML+=input + " ";
+                tries+=1;
+                if(tries==10){
+                    changeButtons()
+                    return document.querySelector("#secondError").innerHTML="You have lost the game! you had more than 10 tries";
+                }   
+            }
+        })
+    }
+
+    //Hides ingame fields and shows restart button
+    function changeButtons(){
+        document.getElementById("quessnumbers").style.display="none";
+        document.getElementById("restart").style.display="inline";
+    }
+
+    //Refresh page function for restart
+    function restart(){
+        location.reload();
+    }
+
+    //Function that generates a random number between two values
+    function randomNumber(min, max){
+    const r = Math.random()*(max-min) + min
+    return Math.floor(r)
+}
+</script>
+</html>
